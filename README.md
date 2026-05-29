@@ -1,22 +1,23 @@
 # Reinforcement Learning Projects
 
-Collection of small reinforcement-learning experiments and environments implemented as Jupyter notebooks.
+This repository documents my journey through Reinforcement Learning during Summer 2026, starting with the default environments inside Python's Gymnasium environment such as blackjack and frozen lake and advancing towards custom environments such as the card game dragontiger and dynamic pricing scenarios.
 
-**Contents**
-- **Notebooks:**
+### **Notebooks:**
   - [frozenlake.ipynb](frozenlake.ipynb) : Q-learning on OpenAI Gym FrozenLake (tabular Q-table and agent class, training + evaluation).
   - [blackjack.ipynb](blackjack.ipynb) : Q-learning agent for the Blackjack environment with policy visualization and learning curve.
   - [dragontiger.ipynb](dragontiger.ipynb) : Custom Dragon-Tiger card game environment and baseline agents (env, deck, rules, rewards).
-  - [dynpricing_pytorch.ipynb](dynpricing_pytorch.ipynb) : Dynamic pricing environment + PyTorch implementations (PPO, TD3, SAC components). Includes training/evaluation loops and a `PPOAgent` class.
-  - [dynpricing_pvp.ipynb](dynpricing_pvp.ipynb) : Multi-agent / oligopoly extension that pits PPO/TD3/SAC agents against each other in a shared market environment.
+  - [dynpricing_pytorch.ipynb](dynpricing_pytorch.ipynb) : Dynamic pricing environment + PyTorch implementations (PPO, TD3, SAC components). Includes training/evaluation loops for the PPO, TD3 and SAC models.
+  - [dynpricing_pvp.ipynb](dynpricing_pvp.ipynb) : Multi-agent extension that pits PPO/TD3/SAC agents against each other in a shared market environment, simulating an oligopolistic market environment.
 
-- **Pretrained / saved models:**
-  - [PPOAgent_final.pth](PPOAgent_final.pth)
-  - [SACAgent_final.pth](SACAgent_final.pth)
-  - [TD3Agent_final.pth](TD3Agent_final.pth)
+___
+### **Dependencies (suggested)**
+- Python 3.9+
+- gymnasium
+- numpy
+- matplotlib
+- torch (if you want to run the PyTorch notebooks)
 
-**Quickstart**
-
+### **Quickstart**
 - Create and activate a Python virtual environment (recommended):
 
 ```powershell
@@ -24,63 +25,55 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1    # PowerShell
 ```
 
-- Install dependencies (minimal):
+- Install dependencies using `requirements.txt`:
 
 ```powershell
 pip install --upgrade pip
-pip install gymnasium numpy matplotlib jupyterlab notebook torch
+pip install requirements.txt
 ```
+- Open the project in Jupyter / VS Code and run the notebooks interactively.
 
-- Open the project in Jupyter / VS Code and run the notebooks interactively. For example:
-
-```powershell
-jupyter lab
-```
-
-**Notebook highlights & usage notes**
-
-- **FrozenLake** ([frozenlake.ipynb](frozenlake.ipynb))
-  - Demonstrates a tabular Q-learning agent for Gym's FrozenLake-v1 (slippery). Includes a `FrozenLakeAgent` class with `train()` and `evaluate()` methods.
+___
+### **Notebook contents**
+1. **Blackjack** ([blackjack.ipynb](blackjack.ipynb))
+  - Tabular Q-learning for Blackjack-v1.
+  - Produces a learned policy visualization and learning curve plots.
+    
+2. **FrozenLake** ([frozenlake.ipynb](frozenlake.ipynb))
+  - Demonstrates a tabular Q-learning agent for Gym's FrozenLake-v1 (slippery).
+  - Includes a `FrozenLakeAgent` class with `train()` and `evaluate()` methods.
   - Run cells to train (EPISODES configurable) and call `evaluate()` to compute success rate.
 
-- **Blackjack** ([blackjack.ipynb](blackjack.ipynb))
-  - Tabular Q-learning for Blackjack-v1. Produces a learned policy visualization and learning curve plots.
+3. **DragonTiger** ([dragontiger.ipynb](dragontiger.ipynb))
+  - Implements a custom Gym environment with card/deck classes and a configurable game loop, useful for testing bandit-style and RL betting agents.
+  - Demonstrates a tabular Q-learning agent for the custom dragontiger environment, utilising double Q-tables
+  - Includes a `DragonTigerAgent` class with `train()` and `evaluate()` methods.
+  - Simulates real scenarios where the model walks away if it suffers a huge loss or if it has made a decent profit (implemented with the method `should_walk_away`) and keeps track of winstreaks to make decisions as well 
+  - Run cells to train (EPISODES configurable) and call `evaluate()` to compute success rate.
 
-- **DragonTiger** ([dragontiger.ipynb](dragontiger.ipynb))
-  - Implements a custom Gym environment with card/deck classes and a configurable game loop. Useful for testing bandit-style and RL betting agents.
+4. **Dynamic Pricing (PyTorch)** ([dynpricing_pytorch.ipynb](dynpricing_pytorch.ipynb))
+  - Builds a custom continuous-action dynamic-pricing environment that simulates a store owner selling 100 units of goods over a span of 30 days.
+  - Since the model is the only seller (model) in the environment, this actually simulates a Monopolistic market.
+  - Implements 3 types of models with the respective components
+      1. Proximal Policy Optimisation (PPO) -> `class PPOAgent` 
+         - PPOActorCritic
+         - RolloutBuffer
+      3. Twin Delayed Deep Deterministic Policy Gradient(TD3) -> `class TD3Agent`
+         - TD3Actor
+         - TD3Critic
+         - ReplayBuffer
+      5. Soft-Actor-Critic(SAC) models -> `class SACAgent`
+         - SACActor
+         - SACCritic
+         - ReplayBuffer (reused from TD3)
+  - Each model's class includes a `train()` and `evaluate()` to train the model and evaluate the performance of each model
+  - Each model also has a `play()` method that simulates the model's actions in the environment for 1 episode 
 
-- **Dynamic Pricing (PyTorch)** ([dynpricing_pytorch.ipynb](dynpricing_pytorch.ipynb))
-  - Builds a continuous-action dynamic-pricing environment and implements PPO training (Actor-Critic), rollout buffer, evaluation helpers, and a `PPOAgent` class. Also contains TD3/SAC model components and evaluation utilities.
-  - To train: run the `train()` cell or instantiate `PPOAgent().train()`; adjust `total_timesteps` for budget.
-
-- **Dynamic Pricing PvP** ([dynpricing_pvp.ipynb](dynpricing_pvp.ipynb))
-  - Loads agent classes (PPO, TD3, SAC), creates an `OligopolyEnv` that resolves simultaneous pricing among multiple agents, and includes training orchestration for multi-agent rounds.
-  - Use `train(agents, n_rounds, timesteps_per_round)` to run PvP rounds and save round checkpoints.
-
-**Loading saved models**
-
-The notebooks define agent classes with `save()`/`load()` helpers. Example (from the notebooks):
-
-```python
-# inside a notebook cell
-agent = PPOAgent()
-agent.load('PPOAgent_final.pth')
-agent.play()
-```
+5. **Dynamic Pricing PvP** ([dynpricing_pvp.ipynb](dynpricing_pvp.ipynb))
+  - Builds a tailored version of the custom dynamic pricing environment `OligopolyEnv`, where the demand signal is a result of all 3 model's actions, ensuring that all models in the environment sees the same state at each step 
+  - Includes a seperate `train(agents, n_rounds, timesteps_per_round)` function to run PvP rounds and save round checkpoints as `.pth` files
+  - Includes a `play_oligopoly(agents, n_episodes=1, deterministic=True)` function to load the final model's `.pth` file and use them to simulate the model's actions in the environment for 1 or more episode
 
 **Recommended workflow**
-
 - Inspect the notebook for the environment and hyperparameters first (the `1. Imports` / `2. Environment` sections).
 - Reduce training budgets (timesteps / episodes) when experimenting locally to keep runtimes reasonable. Use evaluation cells after training to check performance.
-
-**Dependencies (suggested)**
-- Python 3.9+
-- gymnasium
-- numpy
-- matplotlib
-- torch (if you want to run the PyTorch notebooks)
-
-You can capture these exact packages into a requirements file if desired. If you want, I can generate a `requirements.txt` or a minimal driver script to run training headlessly — tell me which notebook to target and I will add it.
-
----
-Generated by inspecting the notebooks in this repository. If you'd like more detailed README sections (experiments, hyperparameters table, sample results, or a requirements file), tell me which parts to expand.

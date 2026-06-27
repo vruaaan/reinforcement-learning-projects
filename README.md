@@ -8,6 +8,7 @@ This repository documents my journey through Reinforcement Learning during Summe
   - [dragontiger.ipynb](dragontiger.ipynb) : Custom Dragon-Tiger card game environment and baseline agents (env, deck, rules, rewards).
   - [dynpricing_pytorch.ipynb](dynpricing_pytorch.ipynb) : Dynamic pricing environment + PyTorch implementations (PPO, TD3, SAC components). Includes training/evaluation loops for the PPO, TD3 and SAC models.
   - [dynpricing_pvp.ipynb](dynpricing_pvp.ipynb) : Multi-agent extension that pits PPO/TD3/SAC agents against each other in a shared market environment, simulating an oligopolistic market environment.
+  - [worldmodel.ipynb](worldmodel.ipynb) : World model experiment for the dynamic-pricing environment, using a rollout buffer and MDN-RNN to learn a "dream" version of the environment.
 
 ___
 ### **Dependencies (suggested)**
@@ -29,7 +30,7 @@ python -m venv .venv
 
 ```powershell
 pip install --upgrade pip
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 - Open the project in Jupyter / VS Code and run the notebooks interactively.
 
@@ -74,6 +75,14 @@ ___
   - Includes a seperate `train(agents, n_rounds, timesteps_per_round)` function to run PvP rounds and save round checkpoints as `.pth` files
   - Includes a `play_oligopoly(agents, n_episodes=1, deterministic=True)` function to load the final model's `.pth` file and use them to simulate the model's actions in the environment for 1 or more episode
 
+6. **World Model / Dream Environment** ([worldmodel.ipynb](worldmodel.ipynb))
+  - Builds on the dynamic-pricing environment by learning a separate model of the environment dynamics.
+  - Uses a `Buffer` class to collect real rollouts as sequences of observations, actions, and done flags.
+  - Implements an `MDNRNN` predictive model that learns a probability distribution over the next state and predicts episode termination.
+  - Wraps the trained MDN-RNN inside `DreamEnv`, allowing an agent to step through a learned "dream" environment instead of the real simulator.
+  - Includes evaluation logic for comparing the dream environment against the real environment using one-step state MAE, reward MAE, and done prediction accuracy.
+
 **Recommended workflow**
 - Inspect the notebook for the environment and hyperparameters first (the `1. Imports` / `2. Environment` sections).
 - Reduce training budgets (timesteps / episodes) when experimenting locally to keep runtimes reasonable. Use evaluation cells after training to check performance.
+- For `worldmodel.ipynb`, train the MDN-RNN on real rollouts before using `DreamEnv` for agent training or evaluation.

@@ -34,6 +34,27 @@ pip install -r requirements.txt
 ```
 - Open the project in Jupyter / VS Code and run the notebooks interactively.
 
+### **Importable Agent Classes**
+The PPO, TD3, and SAC agents are also available as regular Python modules under `classes/`. They are written for Gymnasium environments with continuous `Box` observation and action spaces.
+
+```python
+from classes import DynamicPricingEnv, PPOAgent, TD3Agent, SACAgent
+
+env = DynamicPricingEnv()
+
+ppo = PPOAgent(env=env)
+td3 = TD3Agent(env=env)
+sac = SACAgent(env=env)
+```
+
+You can also import each agent from its own file:
+
+```python
+from classes.ppo import PPOAgent
+from classes.td3 import TD3Agent
+from classes.sac import SACAgent
+```
+
 ___
 ### **Notebook contents**
 1. **Blackjack** ([blackjack.ipynb](blackjack.ipynb))

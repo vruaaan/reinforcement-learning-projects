@@ -124,22 +124,9 @@ class PPOAgent(Agent):
         action_np = action.squeeze(0).cpu().numpy()
         return self.clip_action(action_np)
 
-    def ppo_update(
-        self,
-        obs,
-        actions,
-        old_log_probs,
-        advantages,
-        returns,
-        clip_range=0.2,
-        ent_coef=0.05,
-        vf_coef=0.5,
-        n_epochs=10,
-        batch_size=64,
-    ):
+    def ppo_update(self, obs, actions, old_log_probs, advantages, returns, clip_range=0.2, ent_coef=0.05, vf_coef=0.5, n_epochs=10, batch_size=64):
         total_steps = obs.shape[0]
         self.NN.train()
-
         for _ in range(n_epochs):
             indices = torch.randperm(total_steps, device=self.device)
             for start in range(0, total_steps, batch_size):
